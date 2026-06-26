@@ -34,7 +34,7 @@ def check_stock():
         page_lower = resp.text.lower()
         
         title = "Sony PlayStation 5 Slim 1TB"
-        in_stock = in_stock = True  # TEST MODE - REMOVE LATER
+        in_stock = any(word in page_lower for word in ["add to cart", "buy now"])
         timestamp = datetime.now().strftime('%H:%M:%S')
         
         if in_stock:
