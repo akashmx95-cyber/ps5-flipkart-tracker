@@ -37,7 +37,8 @@ def check_stock():
         title = soup.find('h1').get_text(strip=True)[:100] if soup.find('h1') else "PS5 Slim 1TB"
         page_lower = resp.text.lower()
         
-        in_stock = any(word in page_lower for word in ["in_stock = True])
+        # Detect stock - Correct line
+        in_stock = any(word in page_lower for word in ["add to cart", "buy now"])
         
         if in_stock:
             msg = f"""<b>🎮 PS5 IN STOCK RIGHT NOW! 🎉</b>
