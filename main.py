@@ -4,7 +4,6 @@ import time
 from datetime import datetime
 import os
 from flask import Flask
-import threading
 
 PRODUCTS = [
     {
@@ -24,7 +23,7 @@ app = Flask(__name__)
 @app.route('/')
 def home():
     check_all_products()
-    return "<h1>✅ PS5 Tracker (2 Products - 30 sec) is LIVE</h1>"
+    return "<h1>✅ Stable PS5 Tracker (2 Products) is LIVE</h1>"
 
 def send_telegram(message):
     token = os.environ.get("BOT_TOKEN")
@@ -68,5 +67,5 @@ def check_all_products():
         check_product(product)
 
 if __name__ == "__main__":
-    print("🚀 PS5 Tracker Started (30 sec interval)")
+    print("🚀 Stable PS5 Tracker Started")
     app.run(host='0.0.0.0', port=os.environ.get("PORT", 8080))
