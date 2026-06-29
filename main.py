@@ -23,7 +23,8 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return "<h1>✅ Multi PS5 Tracker (20 sec - Render) is LIVE</h1>"
+    check_all_products()   # Run check on ping too
+    return "<h1>✅ Multi PS5 Tracker (20 sec) is LIVE</h1>"
 
 def send_telegram(message):
     token = os.environ.get("BOT_TOKEN")
@@ -61,12 +62,16 @@ def check_product(product):
     except Exception as e:
         print(f"Error checking {product['name']}: {e}")
 
+def check_all_products():
+    print(f"[{datetime.now().strftime('%H:%M:%S')}] Checking 2 PS5 models...")
+    for product in PRODUCTS:
+        check_product(product)
+
 def background_checker():
     print("🚀 Background Checker Started (20 sec interval)")
-    time.sleep(8)
+    time.sleep(10)
     while True:
-        for product in PRODUCTS:
-            check_product(product)
+        check_all_products()
         time.sleep(20)
 
 if __name__ == "__main__":
