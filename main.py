@@ -4,16 +4,30 @@ import time
 from datetime import datetime
 import os
 from flask import Flask
-import threading
 
-PRODUCT_URL = "https://www.flipkart.com/sony-playstation5-console-slim-cfi-2008a01x-cfi-2116a01y-1-tb/p/itm89489e2adcd2c?pid=GMCGZCYPAFYBUNAR"
+PRODUCTS = [
+    {
+        "url": "https://www.flipkart.com/sony-playstation5-console-slim-cfi-2008a01x-cfi-2116a01y-1-tb/p/itm89489e2adcd2c?pid=GMCGZCYPAFYBUNAR",
+        "name": "PS5 Slim Disc 1TB"
+    },
+    {
+        "url": "https://www.flipkart.com/sony-playstation-5-console-825-gb/p/itma828c9032dd29",
+        "name": "PS5 Disc 825GB"
+    },
+    {
+        "url": "https://www.flipkart.com/sony-ps5-digital-cfi-2116b01y-825-gb/p/itm7124b7348127b",
+        "name": "PS5 Digital 825GB"
+    }
+]
+
 PINCODE = "110053"
 
 app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return "<h1>✅ PS5 Tracker (Fast Mode - Every 2 min) is LIVE</h1>"
+    check_all_products()
+    return "<h1>✅ Multi PS5 Tracker (3 Products) is LIVE</h1>"
 
 def send_telegram(message):
     token = os.environ.get("BOT_TOKEN")
@@ -28,40 +42,34 @@ def send_telegram(message):
     except:
         print("Telegram send failed")
 
-def check_stock():
+def check_product(product):
     try:
         headers = {"User-Agent": "Mozilla/5.0"}
-        resp = requests.get(PRODUCT_URL, headers=headers, timeout=15)
+        resp = requests.get(product["url"], headers=headers, timeout=10)
         page_lower = resp.text.lower()
         
-        title = "Sony PlayStation 5 Slim 1TB"
+        in_stock = any(word in page_lower for word in ["add to cart", "buy now"])
         timestamp = datetime.now().strftime('%H:%M:%S')
         
-        in_stock = any(word in page_lower for word in ["add to cart", "buy now"])
-        
         if in_stock:
-            msg = f"""<b>🎮 PS5 IN STOCK for Pincode {PINCODE}! 🎉</b>
+            msg = f"""<b>🎮 {product["name"]} IN STOCK for Pincode {PINCODE}! 🎉</b>
 
-{title}
-🔗 {PRODUCT_URL}
+🔗 {product["url"]}
 📍 Pincode: {PINCODE}
 🕒 {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"""
             send_telegram(msg)
-            print(f"[{timestamp}] ✅ STOCK FOUND!")
+            print(f"[{timestamp}] ✅ {product['name']} STOCK FOUND!")
         else:
-            print(f"[{timestamp}] Still out of stock")
+            print(f"[{timestamp}] {product['name']} - Still out of stock")
             
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"Error checking {product['name']}: {e}")
 
-def background_checker():
-    print("🚀 Fast Background Checker Started (2 min interval)")
-    time.sleep(5)
-    while True:
-        check_stock()
-        time.sleep(120)  # 2 minutes - faster checks
+def check_all_products():
+    print(f"[{datetime.now().strftime('%H:%M:%S')}] Checking all 3 PS5 models...")
+    for product in PRODUCTS:
+        check_product(product)
 
 if __name__ == "__main__":
-    threading.Thread(target=background_checker, daemon=True).start()
-    print("🚀 Starting on Railway...")
+    print("🚀 Multi PS5 Tracker Started (3 Products)")
     app.run(host='0.0.0.0', port=os.environ.get("PORT", 8080))
