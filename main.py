@@ -12,10 +12,6 @@ PRODUCTS = [
         "name": "PS5 Slim Disc 1TB"
     },
     {
-        "url": "https://www.flipkart.com/sony-playstation-5-console-825-gb/p/itma828c9032dd29",
-        "name": "PS5 Disc 825GB"
-    },
-    {
         "url": "https://www.flipkart.com/sony-ps5-digital-cfi-2116b01y-825-gb/p/itm7124b7348127b",
         "name": "PS5 Digital 825GB"
     }
@@ -28,7 +24,7 @@ app = Flask(__name__)
 @app.route('/')
 def home():
     check_all_products()
-    return "<h1>✅ Multi PS5 Tracker (30 sec) is LIVE</h1>"
+    return "<h1>✅ PS5 Tracker (2 Products - 30 sec) is LIVE</h1>"
 
 def send_telegram(message):
     token = os.environ.get("BOT_TOKEN")
@@ -67,10 +63,10 @@ def check_product(product):
         print(f"Error checking {product['name']}: {e}")
 
 def check_all_products():
-    print(f"[{datetime.now().strftime('%H:%M:%S')}] Checking all 3 PS5 models...")
+    print(f"[{datetime.now().strftime('%H:%M:%S')}] Checking 2 PS5 models...")
     for product in PRODUCTS:
         check_product(product)
 
 if __name__ == "__main__":
-    print("🚀 Multi PS5 Tracker Started (30 sec interval)")
+    print("🚀 PS5 Tracker Started (30 sec interval)")
     app.run(host='0.0.0.0', port=os.environ.get("PORT", 8080))
