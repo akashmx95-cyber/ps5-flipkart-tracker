@@ -4,6 +4,7 @@ import time
 from datetime import datetime
 import os
 from flask import Flask
+import threading
 
 PRODUCTS = [
     {
@@ -22,14 +23,13 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-    check_all_products()
-    return "<h1>✅ Stable PS5 Tracker (2 Products) is LIVE</h1>"
+    return "<h1>✅ Multi PS5 Tracker (20 sec - Render) is LIVE</h1>"
 
 def send_telegram(message):
     token = os.environ.get("BOT_TOKEN")
     chat_id = os.environ.get("CHAT_ID")
     if not token or not chat_id:
-        print("❌ Missing credentials")
+        print("❌ Missing BOT_TOKEN or CHAT_ID")
         return
     url = f"https://api.telegram.org/bot{token}/sendMessage"
     try:
@@ -40,7 +40,7 @@ def send_telegram(message):
 
 def check_product(product):
     try:
-        headers = {"User-Agent": "Mozilla/5.0"}
+        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
         resp = requests.get(product["url"], headers=headers, timeout=10)
         page_lower = resp.text.lower()
         
@@ -61,11 +61,15 @@ def check_product(product):
     except Exception as e:
         print(f"Error checking {product['name']}: {e}")
 
-def check_all_products():
-    print(f"[{datetime.now().strftime('%H:%M:%S')}] Checking 2 PS5 models...")
-    for product in PRODUCTS:
-        check_product(product)
+def background_checker():
+    print("🚀 Background Checker Started (20 sec interval)")
+    time.sleep(8)
+    while True:
+        for product in PRODUCTS:
+            check_product(product)
+        time.sleep(20)
 
 if __name__ == "__main__":
-    print("🚀 Stable PS5 Tracker Started")
-    app.run(host='0.0.0.0', port=os.environ.get("PORT", 8080))
+    threading.Thread(target=background_checker, daemon=True).start()
+    print("🚀 Starting Flask on Render...")
+    app.run(host='0.0.0.0', port=8080)
